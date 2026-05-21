@@ -1,0 +1,210 @@
+name: Merge Gate + Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: merge-gate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  repo-hygiene:
+    name: Repo Hygiene
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for iCloud sync conflicts
+        run: |
+          if find . -path ./node_modules -prune -o -path ./.git -prune -o -path ./static/learning-images -prune -o -name "* [0-9]*" -print | grep -q .; then
+            echo "::error::iCloud sync conflicts detected"
+            find . -path ./node_modules -prune -o -path ./.git -prune -o -path ./static/learning-images -prune -o -name "* [0-9]*" -print
+            exit 1
+          fi
+
+  format:
+    name: Format Check
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm dlx prettier --check .
+
+  typecheck:
+    name: Type Check
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm exec svelte-check --tsconfig ./jsconfig.json
+
+  build:
+    name: Build
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+  deps:
+    name: Dependency Audit
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Dependency audit
+        run: pnpm audit --audit-level=high
+
+  semgrep:
+    name: Semgrep
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Semgrep scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: p/semgrep-rule-links
+
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  required-checks:
+    name: Required Checks (Merge)
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    needs:
+      - repo-hygiene
+      - format
+      - typecheck
+      - build
+      - deps
+      - semgrep
+      - secret-scanning
+    if: always()
+    steps:
+      - name: Verify all jobs passed
+        run: |
+          if [ "${{ needs.repo-hygiene.result }}" != "success" ] || \
+             [ "${{ needs.format.result }}" != "success" ] || \
+             [ "${{ needs.typecheck.result }}" != "success" ] || \
+             [ "${{ needs.build.result }}" != "success" ] || \
+             [ "${{ needs.deps.result }}" != "success" ] || \
+             [ "${{ needs.semgrep.result }}" != "success" ] || \
+             [ "${{ needs.secret-scanning.result }}" != "success" ]; then
+            echo "One or more merge gate jobs failed."
+            exit 1
+          fi
+          echo "All merge gate jobs passed."
+
+  deploy:
+    name: Deploy to Production
+    runs-on: ["self-hosted", "macos", "arm64", "VidiomTM"]
+    needs: required-checks
+    if: needs.required-checks.result == 'success'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync files to server
+        run: |
+          rsync -avz --delete \
+            --exclude 'node_modules' \
+            --exclude '.svelte-kit' \
+            --exclude 'build' \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude '.agents' \
+            --exclude '.playwright-cli' \
+            ./ root@159.223.26.67:/opt/obstetraclick/
+
+      - name: Rebuild and restart Docker container
+        run: |
+          ssh root@159.223.26.67 "cd /opt/obstetraclick && docker compose up -d --build"
+
+      - name: Health check
+        run: |
+          for i in $(seq 1 10); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://obstetraclick.159.223.26.67.nip.io)
+            if [ "$STATUS" = "200" ]; then
+              echo "Health check passed (HTTP $STATUS)"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $STATUS — waiting 10s..."
+            sleep 10
+          done
+          echo "::error::Health check failed after 10 attempts"
+          exit 1
