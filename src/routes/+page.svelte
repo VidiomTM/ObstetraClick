@@ -1359,15 +1359,18 @@
 {#snippet Pelvis(showPlanes = true, answer = null)}
   <svg viewBox="0 0 320 360" width="100%" style="display: block; color: var(--line)">
     <defs><pattern id="pelv-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" stroke-opacity="0.18" stroke-width="0.6" /></pattern></defs>
+    <!-- Background medical illustration -->
+    <image href="/learning-images/pelvis-background.png" x="0" y="0" width="320" height="360" opacity="0.85" />
+    
     <!-- Sacrum and coccyx -->
-    <path d="M180 80 Q210 100 220 140 Q228 180 224 215 Q220 245 200 270" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.4" />
-    <path d="M200 270 Q198 285 188 290" fill="none" stroke="currentColor" stroke-width="1.4" />
-    <circle cx="178" cy="98" r="2.5" fill="currentColor" />
+    <path d="M180 80 Q210 100 220 140 Q228 180 224 215 Q220 245 200 270" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.4" opacity="0.15" />
+    <path d="M200 270 Q198 285 188 290" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.15" />
+    <circle cx="178" cy="98" r="2.5" fill="currentColor" opacity="0.2" />
     <!-- Symphysis pubis -->
-    <ellipse cx="105" cy="165" rx="13" ry="22" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.2" />
+    <ellipse cx="105" cy="165" rx="13" ry="22" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.2" opacity="0.15" />
     <!-- Ischial Spine -->
-    <path d="M150 215 q -10 -6 -25 -3 q -6 4 -2 10 q 12 6 28 -1 z" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.2" />
-    <path d="M147 213 l -7 -3 l 0 6 z" fill="currentColor" />
+    <path d="M150 215 q -10 -6 -25 -3 q -6 4 -2 10 q 12 6 28 -1 z" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.2" opacity="0.15" />
+    <path d="M147 213 l -7 -3 l 0 6 z" fill="currentColor" opacity="0.3" />
     <!-- Fetal descent path -->
     <path d="M118 180 Q135 220 155 245 Q170 260 188 268" fill="none" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.3" stroke-dasharray="3 3" />
     <ellipse cx="170" cy="278" rx="14" ry="9" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.2" />
@@ -1420,33 +1423,36 @@
 {#snippet FetalSkull(highlight = null)}
   <svg viewBox="0 0 280 340" width="100%" style="display: block; color: var(--line)">
     <defs><pattern id="skull-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><line x1="0" y1="0" x2="0" y2="5" stroke="currentColor" stroke-opacity="0.08" stroke-width="0.5" /></pattern></defs>
-    <ellipse cx="140" cy="170" rx="100" ry="130" fill="url(#skull-hatch)" stroke="currentColor" stroke-width="1.4" />
+    <!-- Background medical illustration (rotated to align anterior fontanelle at bottom) -->
+    <image href="/learning-images/fetal-skull-background.png" x="0" y="0" width="280" height="340" transform="rotate(180 140 170)" opacity="0.9" />
+    
+    <ellipse cx="140" cy="170" rx="100" ry="130" fill="url(#skull-hatch)" stroke="currentColor" stroke-width="1.4" opacity="0.1" />
     
     <!-- Wavy Sutures -->
     <!-- Sagittal Suture: connects Lambda base (140,82) to Bregma top (140,228) -->
-    <path d="M 140 82 L 138 90 L 142 98 L 139 106 L 141 114 L 138 122 L 142 130 L 139 138 L 141 146 L 138 154 L 142 162 L 139 170 L 141 178 L 138 186 L 142 194 L 139 202 L 141 210 L 138 218 L 140 228" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" />
+    <path d="M 140 82 L 138 90 L 142 98 L 139 106 L 141 114 L 138 122 L 142 130 L 139 138 L 141 146 L 138 154 L 142 162 L 139 170 L 141 178 L 138 186 L 142 194 L 139 202 L 141 210 L 138 218 L 140 228" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
     
     <!-- Frontal (Metopic) Suture: from Bregma bottom (140,262) to metopic suture (140,295) -->
-    <path d="M 140 262 L 139 270 L 141 278 L 139 286 L 140 295" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" />
+    <path d="M 140 262 L 139 270 L 141 278 L 139 286 L 140 295" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
     
     <!-- Lambdoid Sutures: branch from the two base corners of the Lambda triangle (132,82 and 148,82) -->
-    <path d="M 132 82 L 121 87 L 123 92 L 112 97 L 114 101 L 90 105" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" />
-    <path d="M 148 82 L 159 87 L 157 92 L 168 97 L 166 101 L 190 105" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" />
+    <path d="M 132 82 L 121 87 L 123 92 L 112 97 L 114 101 L 90 105" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
+    <path d="M 148 82 L 159 87 L 157 92 L 168 97 L 166 101 L 190 105" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
     
     <!-- Coronal Sutures: branch from the lateral corners of the Bregma rhomboid (124,245 and 156,245) -->
-    <path d="M 124 245 L 113 243 L 114 239 L 102 238 L 103 234 L 80 235" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" />
-    <path d="M 156 245 L 167 243 L 166 239 L 178 238 L 177 234 L 200 235" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" />
+    <path d="M 124 245 L 113 243 L 114 239 L 102 238 L 103 234 L 80 235" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
+    <path d="M 156 245 L 167 243 L 166 239 L 178 238 L 177 234 L 200 235" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
 
     <!-- Fontanelles -->
     <!-- Fontanela Menor / Lambda (triangle): base at y=82, apex at y=60 -->
-    <polygon points="140,60 132,82 148,82" fill={highlight === 'small-font' ? 'var(--accent)' : 'currentColor'} opacity="0.78" />
+    <polygon points="140,60 132,82 148,82" fill={highlight === 'small-font' ? 'var(--accent)' : 'currentColor'} opacity={highlight === 'small-font' ? 0.78 : 0.05} />
     
     <!-- Fontanela Mayor / Bregma (rhomboid): centers at x=140, y=245 -->
-    <polygon points="140,228 124,245 140,262 156,245" fill={highlight === 'large-font' ? 'var(--accent)' : 'none'} stroke="currentColor" stroke-width="1.4" />
+    <polygon points="140,228 124,245 140,262 156,245" fill={highlight === 'large-font' ? 'var(--accent)' : 'none'} stroke="currentColor" stroke-width="1.4" opacity={highlight === 'large-font' ? 1 : 0.05} />
     
     <!-- Face / Eyes placeholders at the bottom (anterior guide) -->
-    <line x1="140" y1="295" x2="140" y2="305" stroke="currentColor" stroke-width="1.4" />
-    <circle cx="110" cy="288" r="4" fill="none" stroke="currentColor" /><circle cx="170" cy="288" r="4" fill="none" stroke="currentColor" />
+    <line x1="140" y1="295" x2="140" y2="305" stroke="currentColor" stroke-width="1.4" opacity="0.15" />
+    <circle cx="110" cy="288" r="4" fill="none" stroke="currentColor" opacity="0.15" /><circle cx="170" cy="288" r="4" fill="none" stroke="currentColor" opacity="0.15" />
     
     {#if highlight === 'small-font'}<circle cx="140" cy="73" r="22" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="3 3" />{/if}
     {#if highlight === 'large-font'}<circle cx="140" cy="245" r="29" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="3 3" />{/if}
@@ -1455,9 +1461,12 @@
 
 {#snippet Pfeilnaht(position = 'vHHL', size = 240)}
   <svg viewBox="0 0 240 240" width={size} height={size} style="display:block; color: var(--line)">
+    <!-- Background medical illustration (rotated 180 deg to match anterior at bottom) -->
+    <image href="/learning-images/pelvic-outlet-background.png" x="0" y="0" width="240" height="240" transform="rotate(180 120 120)" opacity="0.85" />
+
     <!-- Pelvic outlet rim -->
-    <circle cx="120" cy="120" r="102" fill="var(--bg-card)" stroke="currentColor" stroke-width="1.6" />
-    <circle cx="120" cy="120" r="88" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-dasharray="3 4" />
+    <circle cx="120" cy="120" r="102" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.25" />
+    <circle cx="120" cy="120" r="88" fill="none" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="3 4" />
     
     <!-- Anatomical Labels (Pubis at bottom, Sacrum at top) -->
     <text x="120" y="24" text-anchor="middle" font-family="var(--f-mono)" font-size="9" font-weight="bold" fill="currentColor" opacity="0.8">SACRO (Posterior)</text>
@@ -1526,6 +1535,8 @@
 {#snippet CTGStrip()}
   <svg viewBox="0 0 380 175" width="100%" style="display:block; color: var(--line)">
     <rect x="0" y="0" width="380" height="175" rx="8" fill="var(--bg-card)" stroke="var(--hairline)" />
+    <!-- Background clinical grid underlay -->
+    <image href="/learning-images/ctg-strip.png" x="40" y="0" width="340" height="175" opacity="0.3" preserveAspectRatio="none" />
     
     <!-- Outer borders and split between FHR and UC -->
     <line x1="40" y1="0" x2="40" y2="175" stroke="currentColor" stroke-opacity="0.2" />
