@@ -63,7 +63,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Type check
-        run: pnpm exec svelte-check --tsconfig ./jsconfig.json
+        run: pnpm run check
 
   build:
     name: Build
