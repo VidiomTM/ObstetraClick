@@ -1,0 +1,26 @@
+{
+  "name": "obstetraclick",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SvelteKit app para entrenamiento visual obstétrico con láminas, hotspots y quiz clínico.",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=20.10"
+  },
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "^5.2.13",
+    "@sveltejs/kit": "^2.22.0",
+    "@sveltejs/vite-plugin-svelte": "^5.1.0",
+    "@types/node": "^22.15.21",
+    "svelte": "^5.34.7",
+    "svelte-check": "^4.2.1",
+    "vite": "^6.3.5"
+  }
+}

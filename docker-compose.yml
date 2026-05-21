@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.obstetraclick.rule=Host(`obstetraclick.159.223.26.67.sslip.io`) || Host(`obstetraclick.159.223.26.67.nip.io`)
+      - traefik.http.routers.obstetraclick.entrypoints=http
+      - traefik.http.routers.obstetraclick-https.rule=Host(`obstetraclick.159.223.26.67.nip.io`)
+      - traefik.http.routers.obstetraclick-https.entrypoints=https
+      - traefik.http.routers.obstetraclick-https.tls=true
+      - traefik.http.routers.obstetraclick-https.tls.certresolver=letsencrypt
+      - traefik.http.services.obstetraclick.loadbalancer.server.port=3000
+    restart: unless-stopped
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true
