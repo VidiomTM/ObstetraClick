@@ -488,23 +488,47 @@ em {
 
 .dd-slot {
   position: absolute;
-  min-width: 76px;
+  min-width: 84px;
   height: 28px;
-  padding: 6px 8px;
-  display: grid;
-  place-items: center;
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 999px;
-  border: 1px dashed var(--rule);
-  background: color-mix(in oklab, var(--bg-card) 88%, transparent);
+  border: 1.5px dashed var(--accent);
+  background: color-mix(in oklab, var(--bg-card) 95%, transparent);
+  color: var(--ink);
   font-family: var(--f-mono);
   font-size: 10px;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  text-align-last: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.dd-slot:hover:not(:disabled) {
+  border-color: var(--accent-3);
+  background: color-mix(in oklab, var(--bg-card) 100%, transparent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translate(-50%, -50%) scale(1.05) !important;
+}
+
+.dd-slot:focus:not(:disabled) {
+  border-color: var(--accent-3);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent-3) 25%, transparent);
 }
 
 .dd-slot.filled {
   border-style: solid;
+  border-color: var(--ink);
   background: var(--ink);
-  color: var(--bg);
+  color: var(--bg-card);
 }
 
 .dd-tile {

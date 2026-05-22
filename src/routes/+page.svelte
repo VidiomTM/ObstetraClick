@@ -672,13 +672,13 @@
       xp += correct ? 15 : 3;
       const nextAnswers = answers;
       const sessionAccuracy = Math.round((nextAnswers.filter(Boolean).length / nextAnswers.length) * 100);
-      
+
       if (completedSessions === 0) {
         accuracy = sessionAccuracy;
       } else {
         accuracy = Math.round((accuracy * completedSessions + sessionAccuracy) / (completedSessions + 1));
       }
-      
+
       // Update modeMastery
       if (mode === 'daily') {
         deck.forEach((item, index) => {
@@ -787,7 +787,7 @@
         const t = (x - 210) / 80;
         ucY -= 45 * Math.sin(t * Math.PI);
       }
-      
+
       let fhrY = 45; // baseline 140 bpm (y=45)
       if (x >= 110 && x <= 200) {
         let decelVal = 0;
@@ -1088,6 +1088,7 @@
               {#each current.q.slots as slot}
                 <select
                   class="dd-slot"
+                  class:filled={!!placements[slot.id]}
                   style={`left:${slot.x}%; top:${slot.y}%; transform: translate(-50%, -50%)`}
                   disabled={!!lastAnswer}
                   value={placements[slot.id] || ''}
@@ -1361,7 +1362,7 @@
     <defs><pattern id="pelv-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" stroke-opacity="0.18" stroke-width="0.6" /></pattern></defs>
     <!-- Background medical illustration -->
     <image href="/learning-images/pelvis-background.png" x="0" y="0" width="320" height="360" opacity="0.85" />
-    
+
     <!-- Sacrum and coccyx -->
     <path d="M180 80 Q210 100 220 140 Q228 180 224 215 Q220 245 200 270" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.4" opacity="0.15" />
     <path d="M200 270 Q198 285 188 290" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.15" />
@@ -1374,46 +1375,52 @@
     <!-- Fetal descent path -->
     <path d="M118 180 Q135 220 155 245 Q170 260 188 268" fill="none" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.3" stroke-dasharray="3 3" />
     <ellipse cx="170" cy="278" rx="14" ry="9" fill="url(#pelv-hatch)" stroke="currentColor" stroke-width="1.2" />
-    
-    <!-- Subtle anatomical landmark labels -->
-    <g opacity="0.6" font-family="var(--f-mono)" font-size="8" fill="currentColor">
-      <!-- Promontorio -->
-      <line x1="178" y1="98" x2="230" y2="85" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 2" />
-      <text x="234" y="88" text-anchor="start">Promontorio</text>
-      
-      <!-- Espinas ciáticas -->
-      <line x1="147" y1="213" x2="80" y2="230" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 2" />
-      <text x="76" y="233" text-anchor="end">Espinas ciáticas (Estación 0)</text>
 
-      <!-- Sínfisis púbica -->
-      <line x1="105" y1="165" x2="50" y2="165" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 2" />
-      <text x="46" y="168" text-anchor="end">Sínfisis púbica</text>
-    </g>
+    {#if answer}
+      <!-- Feedback labels are revealed only after answering, so hotspot questions stay unlabelled. -->
+      <g opacity="0.52" font-family="var(--f-mono)" font-size="8" fill="currentColor">
+        <line x1="178" y1="98" x2="230" y2="85" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 2" />
+        <text x="232" y="88" text-anchor="start" stroke="var(--bg-card)" stroke-width="2.2" paint-order="stroke">Promontorio</text>
 
-    <!-- Conjugata vera line and label (Inlet diameter) -->
-    <g opacity="0.65">
-      <line x1="178" y1="98" x2="105" y2="142" stroke="var(--accent)" stroke-width="1" stroke-dasharray="2 2" />
-      <text x="141" y="117" font-family="var(--f-mono)" font-size="7" fill="var(--accent)" text-anchor="middle" transform="rotate(-31 141 117)">Conjugata vera (~11 cm)</text>
-    </g>
+        <line x1="147" y1="213" x2="58" y2="222" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 2" />
+        <text x="60" y="218" text-anchor="start" stroke="var(--bg-card)" stroke-width="2.2" paint-order="stroke">Espinas ciáticas</text>
+
+        <line x1="105" y1="165" x2="60" y2="165" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 2" />
+        <text x="62" y="160" text-anchor="start" stroke="var(--bg-card)" stroke-width="2.2" paint-order="stroke">Sínfisis púbica</text>
+      </g>
+
+      <!-- Conjugata vera line and label (Inlet diameter) -->
+      <g opacity="0.65">
+        <line x1="178" y1="98" x2="105" y2="142" stroke="var(--accent)" stroke-width="1" stroke-dasharray="2 2" />
+        <text x="141" y="117" font-family="var(--f-mono)" font-size="7" fill="var(--accent)" text-anchor="middle" transform="rotate(-31 141 117)">Conjugata vera (~11 cm)</text>
+      </g>
+    {/if}
 
     <!-- DeLee Scale along the descent path, centered at station 0 / ischial spines (147, 208) -->
-    <g opacity="0.45" stroke="currentColor" stroke-width="1">
-      <line x1="127" y1="155" x2="167" y2="261" stroke-dasharray="1 1" />
+    <g opacity="0.8" stroke="currentColor" stroke-width="1">
+      <line x1="124" y1="146" x2="170" y2="270" stroke-dasharray="2 2" stroke-opacity="0.4" />
       {#each [-3, -2, -1, 0, 1, 2, 3] as tick}
-        {@const tx = 147 + tick * 6.6}
-        {@const ty = 208 + tick * 17.6}
-        <line x1={tx - 4} y1={ty} x2={tx + 4} y2={ty} />
-        <text x={tx - 8} y={ty + 3} font-family="var(--f-mono)" font-size="7" stroke="none" fill="currentColor" text-anchor="end">{tick > 0 ? `+${tick}` : tick}</text>
+        {@const tx = 147 + tick * 7.67}
+        {@const ty = 208 + tick * 20.67}
+        {@const isZero = tick === 0}
+        <line x1={tx - (isZero ? 6 : 4)} y1={ty} x2={tx + (isZero ? 6 : 4)} y2={ty} stroke={isZero ? 'var(--accent)' : 'currentColor'} stroke-width={isZero ? 1.6 : 1} />
+        {#if answer}
+          <text x={tx - (isZero ? 9 : 7)} y={ty + 2.5} font-family="var(--f-mono)" font-size={isZero ? '8' : '7'} font-weight={isZero ? 'bold' : 'normal'} stroke="var(--bg-card)" stroke-width="2.5" paint-order="stroke" fill={isZero ? 'var(--accent)' : 'currentColor'} text-anchor="end">{tick > 0 ? `+${tick}` : tick}</text>
+        {/if}
       {/each}
-      <text x="112" y="132" font-family="var(--f-mono)" font-size="7" stroke="none" fill="currentColor">Estaciones DeLee (cm)</text>
+      {#if answer}
+        <text x="188" y="150" font-family="var(--f-mono)" font-size="7" stroke="var(--bg-card)" stroke-width="2.5" paint-order="stroke" fill="currentColor" opacity="0.75" text-anchor="middle">Estaciones DeLee (cm)</text>
+      {/if}
     </g>
 
     {#if showPlanes}
       {#each [{y:112,id:'I'}, {y:157,id:'II'}, {y:208,id:'III'}, {y:310,id:'IV'}] as plane}
         <g opacity={answer && answer !== plane.id ? 0.24 : 1}>
           <!-- Oblique lines parallel to the pelvic inlet (slope -0.6 centered at x=155) -->
-          <line x1="60" y1={plane.y + 57} x2="250" y2={plane.y - 57} stroke={answer === plane.id ? 'var(--accent-3)' : 'currentColor'} stroke-width={answer === plane.id ? 2.2 : 1.2} stroke-dasharray={answer === plane.id ? '0' : '4 4'} />
-          <text x="256" y={plane.y - 57 + 4} font-family="var(--f-display)" font-style="italic" font-size="14" fill={answer === plane.id ? 'var(--accent-3)' : 'currentColor'}>{plane.id}</text>
+          <line x1="60" y1={plane.y + 57} x2="250" y2={plane.y - 57} stroke={answer === plane.id ? 'var(--accent-3)' : 'currentColor'} stroke-width={answer === plane.id ? 2 : 1} stroke-dasharray={answer === plane.id ? '0' : '4 4'} stroke-opacity={answer === plane.id ? 1 : 0.45} />
+          {#if answer}
+            <text x="256" y={plane.y - 57 + 4} font-family="var(--f-display)" font-size="14" font-weight="600" fill={answer === plane.id ? 'var(--accent-3)' : 'currentColor'} stroke="var(--bg-card)" stroke-width="3" paint-order="stroke" style="letter-spacing: 0.1em;">{plane.id}</text>
+          {/if}
         </g>
       {/each}
     {/if}
@@ -1422,39 +1429,74 @@
 
 {#snippet FetalSkull(highlight = null)}
   <svg viewBox="0 0 280 340" width="100%" style="display: block; color: var(--line)">
-    <defs><pattern id="skull-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><line x1="0" y1="0" x2="0" y2="5" stroke="currentColor" stroke-opacity="0.08" stroke-width="0.5" /></pattern></defs>
+    <defs>
+      <pattern id="skull-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+        <line x1="0" y1="0" x2="0" y2="5" stroke="currentColor" stroke-opacity="0.08" stroke-width="0.5" />
+      </pattern>
+
+      <!-- Radial gradient for anterior/large fontanelle glow -->
+      <radialGradient id="bregma-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.65" />
+        <stop offset="60%" stop-color="var(--accent)" stop-opacity="0.25" />
+        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+      </radialGradient>
+
+      <!-- Radial gradient for posterior/small fontanelle glow -->
+      <radialGradient id="lambda-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.7" />
+        <stop offset="65%" stop-color="var(--accent)" stop-opacity="0.25" />
+        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0" />
+      </radialGradient>
+
+      <!-- Soft passive radial gradient to mark fontanelle locations subtly -->
+      <radialGradient id="soft-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="currentColor" stop-opacity="0.15" />
+        <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
+      </radialGradient>
+    </defs>
     <!-- Background medical illustration (rotated to align anterior fontanelle at bottom) -->
     <image href="/learning-images/fetal-skull-background.png" x="0" y="0" width="280" height="340" transform="rotate(180 140 170)" opacity="0.9" />
-    
+
     <ellipse cx="140" cy="170" rx="100" ry="130" fill="url(#skull-hatch)" stroke="currentColor" stroke-width="1.4" opacity="0.1" />
-    
+
     <!-- Wavy Sutures -->
     <!-- Sagittal Suture: connects Lambda base (140,82) to Bregma top (140,228) -->
     <path d="M 140 82 L 138 90 L 142 98 L 139 106 L 141 114 L 138 122 L 142 130 L 139 138 L 141 146 L 138 154 L 142 162 L 139 170 L 141 178 L 138 186 L 142 194 L 139 202 L 141 210 L 138 218 L 140 228" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
-    
+
     <!-- Frontal (Metopic) Suture: from Bregma bottom (140,262) to metopic suture (140,295) -->
     <path d="M 140 262 L 139 270 L 141 278 L 139 286 L 140 295" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
-    
+
     <!-- Lambdoid Sutures: branch from the two base corners of the Lambda triangle (132,82 and 148,82) -->
     <path d="M 132 82 L 121 87 L 123 92 L 112 97 L 114 101 L 90 105" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
     <path d="M 148 82 L 159 87 L 157 92 L 168 97 L 166 101 L 190 105" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
-    
+
     <!-- Coronal Sutures: branch from the lateral corners of the Bregma rhomboid (124,245 and 156,245) -->
     <path d="M 124 245 L 113 243 L 114 239 L 102 238 L 103 234 L 80 235" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
     <path d="M 156 245 L 167 243 L 166 239 L 178 238 L 177 234 L 200 235" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" opacity="0.2" />
 
+    <!-- Glow circles under fontanelles for interactivity and selection highlights -->
+    <circle cx="140" cy="74" r="16" fill="url(#soft-glow)" opacity="0.65" pointer-events="none" />
+    <circle cx="140" cy="245" r="24" fill="url(#soft-glow)" opacity="0.65" pointer-events="none" />
+
+    {#if highlight === 'small-font'}
+      <circle cx="140" cy="74" r="24" fill="url(#lambda-glow)" opacity="1" pointer-events="none" />
+    {/if}
+    {#if highlight === 'large-font'}
+      <circle cx="140" cy="245" r="32" fill="url(#bregma-glow)" opacity="1" pointer-events="none" />
+    {/if}
+
     <!-- Fontanelles -->
     <!-- Fontanela Menor / Lambda (triangle): base at y=82, apex at y=60 -->
-    <polygon points="140,60 132,82 148,82" fill={highlight === 'small-font' ? 'var(--accent)' : 'currentColor'} opacity={highlight === 'small-font' ? 0.78 : 0.05} />
-    
+    <polygon points="140,60 132,82 148,82" fill={highlight === 'small-font' ? 'var(--accent)' : 'currentColor'} opacity={highlight === 'small-font' ? 0.78 : 0.12} />
+
     <!-- Fontanela Mayor / Bregma (rhomboid): centers at x=140, y=245 -->
-    <polygon points="140,228 124,245 140,262 156,245" fill={highlight === 'large-font' ? 'var(--accent)' : 'none'} stroke="currentColor" stroke-width="1.4" opacity={highlight === 'large-font' ? 1 : 0.05} />
-    
+    <polygon points="140,228 124,245 140,262 156,245" fill={highlight === 'large-font' ? 'var(--accent)' : 'none'} stroke="currentColor" stroke-width="1.4" opacity={highlight === 'large-font' ? 0.78 : 0.12} />
+
     <!-- Face / Eyes placeholders at the bottom (anterior guide) -->
     <line x1="140" y1="295" x2="140" y2="305" stroke="currentColor" stroke-width="1.4" opacity="0.15" />
     <circle cx="110" cy="288" r="4" fill="none" stroke="currentColor" opacity="0.15" /><circle cx="170" cy="288" r="4" fill="none" stroke="currentColor" opacity="0.15" />
-    
-    {#if highlight === 'small-font'}<circle cx="140" cy="73" r="22" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="3 3" />{/if}
+
+    {#if highlight === 'small-font'}<circle cx="140" cy="74" r="22" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="3 3" />{/if}
     {#if highlight === 'large-font'}<circle cx="140" cy="245" r="29" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="3 3" />{/if}
   </svg>
 {/snippet}
@@ -1467,62 +1509,72 @@
     <!-- Pelvic outlet rim -->
     <circle cx="120" cy="120" r="102" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.25" />
     <circle cx="120" cy="120" r="88" fill="none" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="3 4" />
-    
+
+    <!-- Programmatic backing circle representing the fetal head -->
+    {#if position === 'asynk'}
+      <circle cx="120" cy="85" r="62" fill="color-mix(in oklab, var(--bg-card) 75%, transparent)" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.15" />
+    {:else}
+      <circle cx="120" cy="120" r="62" fill="color-mix(in oklab, var(--bg-card) 75%, transparent)" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.15" />
+    {/if}
+
     <!-- Anatomical Labels (Pubis at bottom, Sacrum at top) -->
-    <text x="120" y="24" text-anchor="middle" font-family="var(--f-mono)" font-size="9" font-weight="bold" fill="currentColor" opacity="0.8">SACRO (Posterior)</text>
-    <text x="120" y="228" text-anchor="middle" font-family="var(--f-mono)" font-size="9" font-weight="bold" fill="currentColor" opacity="0.8">SÍNFISIS (Anterior)</text>
-    
+    <text x="120" y="24" text-anchor="middle" font-family="var(--f-mono)" font-size="9" font-weight="bold" stroke="var(--bg-card)" stroke-width="3" paint-order="stroke" fill="currentColor" opacity="0.8">SACRO (Posterior)</text>
+    <text x="120" y="228" text-anchor="middle" font-family="var(--f-mono)" font-size="9" font-weight="bold" stroke="var(--bg-card)" stroke-width="3" paint-order="stroke" fill="currentColor" opacity="0.8">SÍNFISIS (Anterior)</text>
+
     {#if position === 'vHHL'}
       <!-- Occiput Anterior Left (vHHL): Occiput (Lambda, triangle) points towards the symphysis pubis / left (bottom-right) -->
       <!-- Sagittal Suture -->
       <line x1="85" y1="85" x2="155" y2="155" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" />
-      
+
       <!-- Fontanela Mayor / Bregma (rhomboid) - towards Sacrum / right (top-left) -->
-      <polygon points="85,73 97,85 85,97 73,85" fill="none" stroke="currentColor" stroke-width="1.8" />
-      
+      <polygon points="85,73 97,85 85,97 73,85" fill="color-mix(in oklab, var(--bg-card) 75%, transparent)" stroke="currentColor" stroke-width="1.8" />
+
       <!-- Fontanela Menor / Lambda (triangle) - towards Sínfisis / left (bottom-right) -->
       <polygon points="162,162 145,157 157,145" fill="var(--accent)" stroke="var(--accent)" stroke-width="1" />
-      
+
       <!-- Direction arrow pointing towards Sínfisis (anterior descent/rotation) -->
       <path d="M170,145 Q185,160 185,175" fill="none" stroke="var(--accent-3)" stroke-width="2" stroke-linecap="round" marker-end="url(#arrow)" />
-      
+
     {:else if position === 'hHHL'}
       <!-- Occiput Posterior Left (hHHL): Occiput (Lambda, triangle) points towards the sacrum / left (top-right) -->
       <!-- Sagittal Suture -->
       <line x1="85" y1="155" x2="155" y2="85" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" />
-      
+
       <!-- Fontanela Mayor / Bregma (rhomboid) - towards Sínfisis / right (bottom-left) -->
-      <polygon points="85,143 97,155 85,167 73,155" fill="none" stroke="currentColor" stroke-width="1.8" />
-      
+      <polygon points="85,143 97,155 85,167 73,155" fill="color-mix(in oklab, var(--bg-card) 75%, transparent)" stroke="currentColor" stroke-width="1.8" />
+
       <!-- Fontanela Menor / Lambda (triangle) - towards Sacrum / left (top-right) -->
       <polygon points="162,78 145,83 157,95" fill="var(--accent)" stroke="var(--accent)" stroke-width="1" />
-      
+
       <!-- Direction arrow pointing towards Sacrum (posterior descent) -->
       <path d="M170,95 Q185,80 185,65" fill="none" stroke="var(--accent-3)" stroke-width="2" stroke-linecap="round" marker-end="url(#arrow)" />
-      
+
     {:else}
       <!-- Asynclitism (asynk): Suture displaced parallel/oblique to the midline -->
       <!-- Midline reference (diámetro transverso normal de la pelvis) -->
       <line x1="38" y1="120" x2="202" y2="120" stroke="currentColor" stroke-opacity="0.25" stroke-width="1.2" stroke-dasharray="3 3" />
-      
+
       <!-- Displaced Sagittal Suture (horizontal, shifted towards Sacrum / top, i.e., y=85) -->
       <line x1="75" y1="85" x2="165" y2="85" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" />
-      
+
       <!-- Fontanela Mayor / Bregma (rhomboid) at anterior end (viewer's left / maternal right) -->
-      <polygon points="65,75 75,85 65,95 55,85" fill="none" stroke="currentColor" stroke-width="1.8" />
-      
+      <polygon points="65,75 75,85 65,95 55,85" fill="color-mix(in oklab, var(--bg-card) 75%, transparent)" stroke="currentColor" stroke-width="1.8" />
+
       <!-- Fontanela Menor / Lambda (triangle) at posterior end (viewer's right / maternal left) -->
       <polygon points="187,85 167,75 167,95" fill="var(--accent)" stroke="var(--accent)" stroke-width="1" />
-      
+
       <!-- Label or indication of displacement -->
-      <path d="M120,115 L120,90" fill="none" stroke="var(--bad)" stroke-width="1.8" stroke-dasharray="3 2" />
-      <polygon points="120,90 117,94 123,94" fill="var(--bad)" />
-      <polygon points="120,115 117,111 123,111" fill="var(--bad)" />
-      <text x="135" y="106" text-anchor="start" font-family="var(--f-mono)" font-size="8" fill="var(--bad)" font-weight="bold">Asinclitismo</text>
+      <g>
+        <line x1="120" y1="114" x2="120" y2="88" stroke="var(--bad)" stroke-width="1.5" stroke-dasharray="2 2" />
+        <polygon points="120,86 116,92 124,92" fill="var(--bad)" />
+        <polygon points="120,116 116,110 124,110" fill="var(--bad)" />
+        <rect x="132" y="93" width="76" height="15" rx="3" fill="color-mix(in oklab, var(--bg-card) 95%, transparent)" stroke="var(--bad)" stroke-opacity="0.3" stroke-width="0.8" />
+        <text x="136" y="104" font-family="var(--f-mono)" font-size="8" fill="var(--bad)" font-weight="bold">ASINCLITISMO</text>
+      </g>
     {/if}
-    
-    <text x="120" y="132" text-anchor="middle" font-family="var(--f-display)" font-style="italic" font-size="12" fill="currentColor" opacity="0.6">Sutura sagital</text>
-    
+
+    <text x="120" y="132" text-anchor="middle" font-family="var(--f-display)" font-style="italic" font-size="12" stroke="var(--bg-card)" stroke-width="2.5" paint-order="stroke" fill="currentColor" opacity="0.7">Sutura sagital</text>
+
     <!-- SVG Marker definitions -->
     <defs>
       <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -1537,11 +1589,11 @@
     <rect x="0" y="0" width="380" height="175" rx="8" fill="var(--bg-card)" stroke="var(--hairline)" />
     <!-- Background clinical grid underlay -->
     <image href="/learning-images/ctg-strip.png" x="40" y="0" width="340" height="175" opacity="0.3" preserveAspectRatio="none" />
-    
+
     <!-- Outer borders and split between FHR and UC -->
     <line x1="40" y1="0" x2="40" y2="175" stroke="currentColor" stroke-opacity="0.2" />
     <line x1="40" y1="87.5" x2="380" y2="87.5" stroke="currentColor" stroke-opacity="0.3" stroke-width="1.4" />
-    
+
     <!-- Time grids (vertical lines, every 1 min = 60 units, start at x=40) -->
     <!-- Bold grids at x = 40, 100, 160, 220, 280, 340 -->
     {#each [40, 100, 160, 220, 280, 340] as vx}
@@ -1551,7 +1603,7 @@
     {#each [70, 130, 190, 250, 310, 370] as vx}
       <line x1={vx} y1="0" x2={vx} y2="175" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="2 2" />
     {/each}
-    
+
     <!-- Horizontal Grid lines for FHR (bpm): 180, 160, 140, 120, 100 -->
     <!-- y values: 180=15, 160=30, 140=45, 120=60, 100=75 -->
     {#each [{y:15, val:'180'}, {y:30, val:'160'}, {y:45, val:'140'}, {y:60, val:'120'}, {y:75, val:'100'}] as grid}
@@ -1559,7 +1611,7 @@
       <text x="32" y={grid.y + 3} text-anchor="end" font-family="var(--f-mono)" font-size="8" fill="currentColor" opacity="0.6">{grid.val}</text>
     {/each}
     <text x="8" y="48" font-family="var(--f-mono)" font-size="7" fill="currentColor" opacity="0.5" transform="rotate(-90 8 48)" text-anchor="middle">FCF (lpm)</text>
-    
+
     <!-- Horizontal Grid lines for UC (mmHg): 100, 50, 0 -->
     <!-- y values: 100=100, 50=122.5, 0=145 -->
     {#each [{y:100, val:'100'}, {y:122.5, val:'50'}, {y:145, val:'0'}] as grid}
@@ -1567,31 +1619,34 @@
       <text x="32" y={grid.y + 3} text-anchor="end" font-family="var(--f-mono)" font-size="8" fill="currentColor" opacity="0.6">{grid.val}</text>
     {/each}
     <text x="8" y="122" font-family="var(--f-mono)" font-size="7" fill="currentColor" opacity="0.5" transform="rotate(-90 8 122)" text-anchor="middle">CU (mmHg)</text>
-    
+
     <!-- Underlay shading for normal FHR band (110 - 160 bpm, y=67.5 to y=30) -->
     <rect x="40" y="30" width="340" height="37.5" fill="var(--accent-3)" opacity="0.04" />
-    
+
     <!-- FHR and UC curves -->
-    <path d={ctgFhrPath} fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-    <path d={ctgUcPath} fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.8" />
-    
+    <path d={ctgFhrPath} fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d={ctgUcPath} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" />
+
+    <!-- Delay shading block to visually represent the late decel lag phase -->
+    <rect x="250" y="15" width="30" height="130" fill="var(--bad)" opacity="0.06" pointer-events="none" />
+
     <!-- Clinical DIP II Late Decel visual indicators -->
     <!-- Highlight second contraction cycle: Peak at x=250, Nadir at x=280 -->
     <!-- Line from peak of contraction -->
-    <line x1="250" y1="95" x2="250" y2="40" stroke="var(--bad)" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="3 3" />
+    <line x1="250" y1="95" x2="250" y2="40" stroke="var(--bad)" stroke-opacity="0.4" stroke-width="1.2" stroke-dasharray="2 3" />
     <!-- Line from nadir of deceleration -->
-    <line x1="280" y1="71" x2="280" y2="140" stroke="var(--bad)" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="3 3" />
-    
+    <line x1="280" y1="71" x2="280" y2="140" stroke="var(--bad)" stroke-opacity="0.4" stroke-width="1.2" stroke-dasharray="2 3" />
+
     <!-- Double-headed arrow between Peak (250) and Nadir (280) -->
-    <path d="M250,83 L280,83" stroke="var(--bad)" stroke-width="1.5" marker-start="url(#d-arrow-left)" marker-end="url(#d-arrow-right)" />
-    <text x="265" y="78" text-anchor="middle" font-family="var(--f-mono)" font-weight="bold" font-size="8" fill="var(--bad)">Decalage (>30s)</text>
-    
+    <path d="M250,83 L280,83" stroke="var(--bad)" stroke-width="1.8" marker-start="url(#d-arrow-left)" marker-end="url(#d-arrow-right)" />
+    <text x="265" y="78" text-anchor="middle" font-family="var(--f-mono)" font-weight="bold" font-size="8" stroke="var(--bg-card)" stroke-width="2.5" paint-order="stroke" fill="var(--bad)">Decalage (>30s)</text>
+
     <!-- Markers for Peak and Nadir -->
-    <circle cx="250" cy="95" r="3" fill="currentColor" />
-    <circle cx="280" cy="71" r="3" fill="var(--bad)" />
-    <text x="245" y="105" text-anchor="end" font-family="var(--f-mono)" font-size="7" fill="currentColor">Pico de contracción</text>
-    <text x="285" y="65" text-anchor="start" font-family="var(--f-mono)" font-size="7" fill="var(--bad)" font-weight="bold">Nadir tardío (DIP II)</text>
-    
+    <circle cx="250" cy="95" r="3.5" fill="currentColor" stroke="var(--bg-card)" stroke-width="1" />
+    <circle cx="280" cy="71" r="3.5" fill="var(--bad)" stroke="var(--bg-card)" stroke-width="1" />
+    <text x="245" y="104" text-anchor="end" font-family="var(--f-mono)" font-size="7" stroke="var(--bg-card)" stroke-width="2.5" paint-order="stroke" fill="currentColor">Pico de contracción</text>
+    <text x="285" y="65" text-anchor="start" font-family="var(--f-mono)" font-size="7" font-weight="bold" stroke="var(--bg-card)" stroke-width="2.5" paint-order="stroke" fill="var(--bad)">Nadir tardío (DIP II)</text>
+
     <!-- Marker definitions for double-headed arrow -->
     <defs>
       <marker id="d-arrow-left" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
@@ -1812,14 +1867,16 @@
         <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="var(--accent)" />
       </marker>
     </defs>
-    <rect x="4" y="4" width="62" height="62" rx="8" fill="var(--bg-2)" stroke="currentColor" stroke-opacity="0.22" />
+    <!-- Background medical illustration -->
+    <image href={`/learning-images/${step}-background.png`} x="4" y="4" width="62" height="62" opacity="0.85" />
+    <rect x="4" y="4" width="62" height="62" rx="8" fill="none" stroke="currentColor" stroke-opacity="0.22" />
     {#if step === 'mcroberts'}
       <!-- McRoberts: flexed thighs up against abdomen -->
-      <line x1="8" y1="58" x2="62" y2="58" stroke="currentColor" stroke-opacity="0.3" stroke-dasharray="2 2" />
+      <line x1="8" y1="58" x2="62" y2="58" stroke="currentColor" stroke-opacity="0.2" stroke-dasharray="2 2" />
       <!-- Torso outline -->
-      <path d="M 12 50 C 20 42, 32 42, 40 48 C 43 51, 45 54, 46 58" fill="none" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.2" />
+      <path d="M 12 50 C 20 42, 32 42, 40 48 C 43 51, 45 54, 46 58" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.2" />
       <!-- Normal leg position (ghosted) -->
-      <path d="M 44 50 L 52 32 L 60 45" fill="none" stroke="currentColor" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="2 2" />
+      <path d="M 44 50 L 52 32 L 60 45" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-width="1" stroke-dasharray="2 2" />
       <!-- Hyperflexed leg -->
       <path d="M 44 50 L 26 30 L 12 34" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
       <!-- Flexion arrow -->
@@ -1828,14 +1885,14 @@
     {:else if step === 'suprapubic'}
       <!-- Suprapubic pressure: downwards/posterior force vector near pubic symphysis -->
       <!-- Maternal pelvis bones / symphysis pubis representation -->
-      <path d="M 38 48 Q 42 46 44 50 Q 42 54 38 48 Z" fill="currentColor" fill-opacity="0.15" stroke="currentColor" stroke-width="0.8" />
-      <text x="44" y="55" font-family="var(--f-mono)" font-size="5" fill="currentColor">Pubis</text>
-      
+      <path d="M 38 48 Q 42 46 44 50 Q 42 54 38 48 Z" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="0.8" />
+      <text x="44" y="55" font-family="var(--f-mono)" font-size="5" fill="currentColor" opacity="0.6">Pubis</text>
+
       <!-- Fetal head already delivered, pointing downwards -->
-      <circle cx="20" cy="54" r="5" fill="none" stroke="currentColor" stroke-opacity="0.5" stroke-dasharray="1 1" />
+      <circle cx="20" cy="54" r="5" fill="none" stroke="currentColor" stroke-opacity="0.3" stroke-dasharray="1 1" />
       <!-- Fetal neck & chest stuck behind pubis -->
-      <path d="M 20 49 C 24 47 28 42 32 36 L 46 36" fill="none" stroke="currentColor" stroke-width="1.2" />
-      
+      <path d="M 20 49 C 24 47 28 42 32 36 L 46 36" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.4" />
+
       <!-- Downward and posterior pressure arrow (Mazzanti/Rubin I) applied above pubis -->
       <path d="M 24 16 L 31 34" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" marker-end="url(#m-arrow)" />
       <text x="18" y="18" font-family="var(--f-mono)" font-size="7" fill="var(--accent)" font-weight="bold">Presión</text>
@@ -1843,20 +1900,20 @@
     {:else if step === 'woods'}
       <!-- Woods/Rubin rotation: internal shoulder rotation -->
       <!-- Pelvic inlet boundary -->
-      <circle cx="35" cy="33" r="21" fill="none" stroke="currentColor" stroke-opacity="0.25" stroke-width="1" />
-      
+      <circle cx="35" cy="33" r="21" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-width="1" />
+
       <!-- Pubis (anterior / bottom of the pelvis in this projection) -->
-      <circle cx="35" cy="54" r="2.5" fill="currentColor" />
-      <text x="35" y="60" text-anchor="middle" font-family="var(--f-mono)" font-size="5" fill="currentColor">Pubis</text>
-      
+      <circle cx="35" cy="54" r="2.5" fill="currentColor" opacity="0.5" />
+      <text x="35" y="60" text-anchor="middle" font-family="var(--f-mono)" font-size="5" fill="currentColor" opacity="0.6">Pubis</text>
+
       <!-- Sacrum (posterior / top of the pelvis in this projection) -->
-      <path d="M 31 12 Q 35 9 39 12" fill="none" stroke="currentColor" stroke-width="1.2" />
-      <text x="35" y="8" text-anchor="middle" font-family="var(--f-mono)" font-size="5" fill="currentColor">Sacro</text>
-      
+      <path d="M 31 12 Q 35 9 39 12" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.4" />
+      <text x="35" y="8" text-anchor="middle" font-family="var(--f-mono)" font-size="5" fill="currentColor" opacity="0.6">Sacro</text>
+
       <!-- Fetal shoulders -->
-      <line x1="23" y1="33" x2="47" y2="33" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
-      <circle cx="35" cy="33" r="6" fill="var(--bg-2)" stroke="currentColor" stroke-width="1.2" />
-      
+      <line x1="23" y1="33" x2="47" y2="33" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" opacity="0.4" />
+      <circle cx="35" cy="33" r="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.4" />
+
       <!-- Rotation arrows -->
       <path d="M 21 28 A 14 14 0 0 1 35 15" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#m-arrow)" />
       <path d="M 49 38 A 14 14 0 0 1 35 51" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" marker-end="url(#m-arrow)" />
@@ -1864,15 +1921,15 @@
     {:else if step === 'jacquemier'}
       <!-- Jacquemier: sweep and deliver posterior arm -->
       <!-- Birth canal boundaries -->
-      <line x1="8" y1="16" x2="62" y2="16" stroke="currentColor" stroke-opacity="0.2" stroke-dasharray="2 2" />
-      <line x1="8" y1="52" x2="62" y2="52" stroke="currentColor" stroke-opacity="0.2" stroke-dasharray="2 2" />
-      
+      <line x1="8" y1="16" x2="62" y2="16" stroke="currentColor" stroke-opacity="0.15" stroke-dasharray="2 2" />
+      <line x1="8" y1="52" x2="62" y2="52" stroke="currentColor" stroke-opacity="0.15" stroke-dasharray="2 2" />
+
       <!-- Baby's chest and shoulder -->
-      <path d="M 46 22 C 40 24 34 30 32 38 L 56 38" fill="none" stroke="currentColor" stroke-width="1.5" />
-      
+      <path d="M 46 22 C 40 24 34 30 32 38 L 56 38" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4" />
+
       <!-- Swept posterior arm and hand -->
       <path d="M 35 28 C 26 31 21 37 25 43 C 27 45 34 44 46 44" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-      
+
       <!-- Direction arrow showing sweeping exit -->
       <path d="M 23 37 C 24 45 32 49 42 47" fill="none" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="2 2" marker-end="url(#m-arrow)" />
       <text x="44" y="27" font-family="var(--f-mono)" font-size="5.5" fill="var(--accent)">Brazo post.</text>
@@ -1883,10 +1940,12 @@
 
 {#snippet HeatmapFigure(large = false)}
   <svg viewBox="0 0 220 260" width="100%" style={`display:block; color: var(--line); ${large ? 'max-height: 330px' : ''}`}>
-    <ellipse cx="110" cy="80" rx="32" ry="44" fill="color-mix(in oklab, var(--accent-2) 45%, var(--bg-card))" stroke="currentColor" stroke-width="1.2" />
-    <path d="M66 142 C82 108 138 108 154 142 C164 164 149 196 110 214 C71 196 56 164 66 142Z" fill="color-mix(in oklab, var(--bad) 42%, var(--bg-card))" stroke="currentColor" stroke-width="1.2" />
-    <path d="M84 154 Q110 126 136 154 Q128 184 110 195 Q92 184 84 154Z" fill="color-mix(in oklab, var(--accent-3) 52%, var(--bg-card))" stroke="currentColor" stroke-width="1.2" />
-    <path d="M72 221 Q110 238 148 221" fill="none" stroke="var(--bad)" stroke-width="7" stroke-linecap="round" />
+    <!-- Background medical illustration -->
+    <image href="/learning-images/heatmap-background.png" x="10" y="30" width="200" height="220" opacity="0.65" />
+    <ellipse cx="110" cy="80" rx="32" ry="44" fill="color-mix(in oklab, var(--accent-2) 45%, var(--bg-card))" stroke="currentColor" stroke-width="1.2" opacity="0.8" />
+    <path d="M66 142 C82 108 138 108 154 142 C164 164 149 196 110 214 C71 196 56 164 66 142Z" fill="color-mix(in oklab, var(--bad) 42%, var(--bg-card))" stroke="currentColor" stroke-width="1.2" opacity="0.8" />
+    <path d="M84 154 Q110 126 136 154 Q128 184 110 195 Q92 184 84 154Z" fill="color-mix(in oklab, var(--accent-3) 52%, var(--bg-card))" stroke="currentColor" stroke-width="1.2" opacity="0.8" />
+    <path d="M72 221 Q110 238 148 221" fill="none" stroke="var(--bad)" stroke-width="7" stroke-linecap="round" opacity="0.8" />
     <text x="110" y="24" text-anchor="middle" font-family="var(--f-mono)" font-size="10" fill="currentColor">VISUAL ATLAS</text>
   </svg>
 {/snippet}
