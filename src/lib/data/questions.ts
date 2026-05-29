@@ -56,7 +56,7 @@ export type CtgQuestion = {
 	rationale: string;
 };
 
-export const pelvisZones: Zone[] = [
+const pelvisZones: Zone[] = [
 	{ id: 'I', cx: 50, cy: 31 },
 	{ id: 'II', cx: 50, cy: 44 },
 	{ id: 'III', cx: 50, cy: 58 },
